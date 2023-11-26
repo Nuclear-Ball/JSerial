@@ -1,0 +1,2 @@
+# JSerial
+Simple C++ serializer
