@@ -8,7 +8,7 @@
 
 using namespace std;
 
-#define manual_write
+//#define manual_write
 
 namespace bits {
 	template<typename T> string Separate(T dat) {
@@ -89,7 +89,7 @@ namespace JSerial {
 				cursor_pos += sizeof(T);
 				check_and_switch();
 			}
-			else cout << "\nincorrect type bruh: " << typeid(T).name << " instead of " << curr_type.t_name << endl;
+			else cout << "\nincorrect type bruh: " << typeid(T).name() << " instead of " << curr_type.t_name << endl;
 		}
 
 		//не поддерживает строки. Используйте функцию write_string_array();
@@ -107,7 +107,7 @@ namespace JSerial {
 					write_jmpt();
 				check_and_switch();
 			}
-			else cout << "\nincorrect type bruh: " << typeid(T).name << " array" << " instead of " << curr_type.t_name << endl;
+			else cout << "\nincorrect type bruh: " << typeid(T).name() << " array" << " instead of " << curr_type.t_name << endl;
 		}
 
 		void write_string(string str) {
@@ -224,9 +224,12 @@ namespace JSerial {
 				if (active_templates[active_templates.size() - 2].item_id < active_templates[active_templates.size() - 2].types.size() - 1)
 					cursor_pos += sizeof(size_t);
 				cursor_pos += sizeof(size_t);
+				
 
 				cursor_pos += (id * sizeof(size_t));
 				cursor_pos = bits::Merge<size_t>(data.substr(cursor_pos, sizeof(size_t)));
+				active_templates.back().start_pos = cursor_pos;
+				active_templates.back().starting_point = cursor_pos;
 
 				act_templ_arrs.back().current_element = id;
 			}
