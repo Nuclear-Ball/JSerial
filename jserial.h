@@ -89,7 +89,7 @@ namespace JSerial {
 				cursor_pos += sizeof(T);
 				check_and_switch();
 			}
-			else cout << "\nincorrect type bruh: " << typeid(T).name() << " instead of " << curr_type.t_name << endl;
+			else cout << "\nincorrect type bruh: " << typeid(T).name() << " instead of " << curr_type.t_name << (curr_type.is_array ? " array" : "") << endl;
 		}
 
 		//не поддерживает строки. Используйте функцию write_string_array();
@@ -107,7 +107,7 @@ namespace JSerial {
 					write_jmpt();
 				check_and_switch();
 			}
-			else cout << "\nincorrect type bruh: " << typeid(T).name() << " array" << " instead of " << curr_type.t_name << endl;
+			else cout << "\nincorrect type bruh: " << typeid(T).name() << "array" << " instead of " << curr_type.t_name << (curr_type.is_array ? " array" : "") << endl;
 		}
 
 		void write_string(string str) {
@@ -123,7 +123,7 @@ namespace JSerial {
 					write_jmpt();
 				check_and_switch();
 			}
-			else cout << "\nincorrect type bruh: " << "string" << " instead of " << curr_type.t_name;
+			else cout << "\nincorrect type bruh: " << "string" << " instead of " << curr_type.t_name << (curr_type.is_array ? " array" : "") << endl;
 		}
 
 		void write_string_array(vector<string> dat) {
@@ -139,7 +139,7 @@ namespace JSerial {
 					write_jmpt();
 				check_and_switch();
 			}
-			else cout << "\nincorrect type bruh: " << "string array" << " instead of " << curr_type.t_name << endl;
+			else cout << "\nincorrect type bruh: " << "string array" << " instead of " << curr_type.t_name << (curr_type.is_array ? " array" : "") << endl;
 		}
 
 		void prepare_template_array_write(size_t amount) {
@@ -158,7 +158,7 @@ namespace JSerial {
 					prepare_template_write();
 #endif
 			}
-			else cout << "\nincorrect type bruh: " << "templ array" << " instead of " << curr_type.t_name << endl;
+			else cout << "\nincorrect type bruh: " << "templ array" << " instead of " << curr_type.t_name << (curr_type.is_array ? " array" : "") << endl;
 		}
 
 		#ifdef manual_write
@@ -194,7 +194,7 @@ namespace JSerial {
 					else return leave_template();
 				}
 			}
-			else cout << "\nincorrect type bruh\n";
+			else cout << "\nbruh: no active templates\n";
 		}
 
 		size_t enter_template_array() {
@@ -210,7 +210,7 @@ namespace JSerial {
 				acess_element_of_template_array(0);
 				return act_templ_arrs.back().number_of_elements;
 			}
-			else cout << "\nincorrect type bruh\n";
+			else cout << "\nincorrect type bruh: " << "templ array" << " instead of " << curr_type.t_name << endl;
 		}
 
 		//для работы этой функции необходимо войти в шаблонный массив. Функция также будет работать, если находишься в каком-либо из элементов
@@ -228,12 +228,14 @@ namespace JSerial {
 
 				cursor_pos += (id * sizeof(size_t));
 				cursor_pos = bits::Merge<size_t>(data.substr(cursor_pos, sizeof(size_t)));
+
 				active_templates.back().start_pos = cursor_pos;
 				active_templates.back().starting_point = cursor_pos;
+				active_templates.back().item_id = 0;
 
 				act_templ_arrs.back().current_element = id;
 			}
-			else cout << "\nincorrect type bruh\n";
+			else cout << "\nbruh: there is no template arrays\n";
 		}
 
 		//выйти из шаблонного массива. Будет работать, даже если до массива есть несколько уровней обычных шаблонов.
@@ -246,6 +248,7 @@ namespace JSerial {
 
 				act_templ_arrs.pop_back();
 			}
+			else cout << "\nbruh: there is no template arrays\n";
 			if (!no_next_after_reading)
 				next();
 		}
@@ -261,7 +264,7 @@ namespace JSerial {
 					cursor_pos += sizeof(size_t);
 				active_templates.back().starting_point = cursor_pos;
 			}
-			else cout << "\nincorrect type bruh\n";
+			else cout << "\nincorrect type bruh: " << "template" << " instead of " << curr_type.t_name << (curr_type.is_array ? " array" : "") << endl;
 		}
 
 		void leave_template() {
@@ -272,7 +275,7 @@ namespace JSerial {
 				if (!no_next_after_reading)
 					next();
 			}
-			//else cout << "\nincorrect type bruh\n";
+			else cout << "\nbruh: leaving from main template\n";
 		}
 
 		void go_to(string key) {
@@ -289,6 +292,7 @@ namespace JSerial {
 					active_templates.back().item_id++;
 				}
 			}
+			else cout << "\nbruh: invalid id\n";
 		}
 
 		template<typename T> T read_basic_data() {
@@ -300,7 +304,7 @@ namespace JSerial {
 					next();
 				return a;
 			}
-			else cout << "\nincorrect type bruh\n";
+			else cout << "\nincorrect type bruh: " << typeid(T).name() << " instead of " << curr_type.t_name << (curr_type.is_array ? " array" : "") << endl;
 		}
 
 		template<typename T> vector<T> read_basic_array() {
@@ -325,7 +329,7 @@ namespace JSerial {
 					next();
 				return a;
 			}
-			else cout << "\nincorrect type bruh\n";
+			else cout << "\nincorrect type bruh: " << typeid(T).name() << "array" << " instead of " << curr_type.t_name << (curr_type.is_array ? " array" : "") << endl;
 		}
 
 		string read_string() {
@@ -345,7 +349,7 @@ namespace JSerial {
 					next();
 				return a;
 			}
-			else cout << "\nincorrect type bruh\n";
+			else cout << "\nincorrect type bruh: " << "string" << " instead of " << curr_type.t_name << (curr_type.is_array ? " array" : "") << endl;
 		}
 
 		vector<string> read_string_array() {
@@ -371,7 +375,7 @@ namespace JSerial {
 					next();
 				return a;
 			}
-			else cout << "\nincorrect type bruh\n";
+			else cout << "\nincorrect type bruh: " << "string array" << " instead of " << curr_type.t_name << (curr_type.is_array ? " array" : "") << endl;
 		}
 
 	private:
