@@ -8,6 +8,7 @@
 
 using namespace std;
 
+#define manual_write
 
 namespace bits {
 	template<typename T> string Separate(T dat) {
@@ -88,7 +89,7 @@ namespace JSerial {
 				cursor_pos += sizeof(T);
 				check_and_switch();
 			}
-			else cout << "\nincorrect type bruh\n";
+			else cout << "\nincorrect type bruh: " << typeid(T).name << " instead of " << curr_type.t_name << endl;
 		}
 
 		//не поддерживает строки. Используйте функцию write_string_array();
@@ -106,7 +107,7 @@ namespace JSerial {
 					write_jmpt();
 				check_and_switch();
 			}
-			else cout << "\nincorrect type bruh\n";
+			else cout << "\nincorrect type bruh: " << typeid(T).name << " array" << " instead of " << curr_type.t_name << endl;
 		}
 
 		void write_string(string str) {
@@ -122,7 +123,7 @@ namespace JSerial {
 					write_jmpt();
 				check_and_switch();
 			}
-			else cout << "\nincorrect type bruh\n";
+			else cout << "\nincorrect type bruh: " << "string" << " instead of " << curr_type.t_name;
 		}
 
 		void write_string_array(vector<string> dat) {
@@ -138,7 +139,7 @@ namespace JSerial {
 					write_jmpt();
 				check_and_switch();
 			}
-			else cout << "\nincorrect type bruh\n";
+			else cout << "\nincorrect type bruh: " << "string array" << " instead of " << curr_type.t_name << endl;
 		}
 
 		void prepare_template_array_write(size_t amount) {
@@ -152,11 +153,18 @@ namespace JSerial {
 				write_jmpt();
 				active_templates.push_back(active_templates.back().templates[curr_type.template_link]);
 				act_templ_arrs.push_back({ amount, active_templates.size(), 0, 0 /*стартовая позиция нужна только при чтении*/ });
+#ifndef manual_write
 				if (active_templates.back().types[0].t_name == "templ" && !active_templates.back().types[0].is_array)
 					prepare_template_write();
+#endif
 			}
-			else cout << "\nincorrect type bruh\n";
+			else cout << "\nincorrect type bruh: " << "templ array" << " instead of " << curr_type.t_name << endl;
 		}
+
+		#ifdef manual_write
+
+		#endif
+
 
 		//--------------------------------------------------------------------------Чтение файла--------------------------------------------
 
@@ -385,22 +393,30 @@ namespace JSerial {
 		void check_and_switch() {
 			if (active_templates.back().item_id < active_templates.back().types.size() - 1) {
 				active_templates.back().item_id++;
+#ifndef manual_write
 				if (!get_current_type().is_pod && !get_current_type().is_array && get_current_type().t_name != typeid(string).name())
 					prepare_template_write();
+#endif		
 			}
 			else {
 				if (active_templates.size() == 1) return;
+#ifndef manual_write
 				if (!get_current_type(2).is_pod && !get_current_type(2).is_array)
 					return end_template_write();
+#endif		
 				if (act_templ_arrs.size() && act_templ_arrs.back().layer == active_templates.size()) {
 					act_templ_arrs.back().current_element++, active_templates.back().item_id = 0;
 
 					if (act_templ_arrs.back().current_element < act_templ_arrs.back().number_of_elements) {
 						write_jmpt();
+#ifndef manual_write
 						if (is_template(get_current_type()))
 							prepare_template_write();
+#endif
 					}
+#ifndef manual_write
 					else end_template_array_write();
+#endif
 				}
 			}
 		}
@@ -410,6 +426,7 @@ namespace JSerial {
 			cursor_pos += amount * sizeof(size_t);
 		}
 
+#ifndef manual_write
 		void prepare_template_write() {
 			if (active_templates.back().item_id < active_templates.back().types.size() - 1)
 				reserve_adresses(1);
@@ -433,8 +450,8 @@ namespace JSerial {
 			if (active_templates.back().item_id < active_templates.back().types.size() - 1)
 				write_jmpt();
 			check_and_switch();
-		}
-
+}
+		#endif
 		//--------------------------------------------------------------------------Чтение файла--------------------------------------------
 
 		bool is_template_array() {
