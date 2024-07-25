@@ -1,13 +1,8 @@
 # JSerial
-Simple C++ serializer
+A simple C++ serializer
 
-# How to use:
-# Initializing:
-1) Create template using JSerial::JsTemplate
-2) Add types using .add_basic_type<(pod datatуpe)>(), .add_array<(pod datatуpe of the element)>() or .add_template(), yes, you can nest templates, and even make template arrays
-3) Create serializer object with JSerial::JSerial
-4) Do .main_template = <your mаin template>; .init_write() or .init_read();
-# Writing
-1) Write to your serializer object data with .write_basic_data<>(), .write_basic_array<>(). Note that you MUST write types in the order, which they are present in the template. Also you should know that these functions does not support strings and you should use .write_string() and .write_string_array() with strings. To initialize template array write you should use .prepare_template_array_write(). The write in regular templates is being initialized automatically.
-2) Done! Then save output .data string somewhere
-# Reading
+# Usage:
+View "JSLite_example.cpp" to understand how this works. Also note that "jserial.h" is no longer supported(even if it was published recently), it was last updated more than 6 months ago, its pretty slow, and i generaly dont recommend using it, unless it's easier for you to see type names when reading data and have error messages. Im not even sure if data produced by both serializers is even compatible...
+
+# Known issues: 
+The serializer doesn't save any type information, it assumes that both sender and reciever have the same data template. This makes it much more faster and memory efficient, howewer if sender and reciever have even slightly different templates(for example if using different versions of the same software), it might have undefined behaviour.
